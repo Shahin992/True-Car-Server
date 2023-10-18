@@ -33,6 +33,19 @@ async function run() {
     await client.connect();
 
     const productsCollection = client.db('products').collection('product');
+    const usersCollection = client.db('Truecarusersdb').collection('Truecarusers')
+
+    
+    app.get('/products',async (req, res) => {
+        const result = await productsCollection.find().toArray();
+        res.send(result)
+    })
+
+    app.get('/users',async (req, res) => {
+        const result = await usersCollection.find().toArray();
+        res.send(result)
+    })
+    
 
     app.post('/products', async (req, res) => {
         const newProduct = req.body;
@@ -40,6 +53,13 @@ async function run() {
         const result = await productsCollection.insertOne(newProduct);
         res.send(result)
 
+    })
+
+    app.post('/users', async (req,res) =>{
+      const newUser = req.body;
+      console.log(newUser);
+      const result = await usersCollection.insertOne(newUser);
+      res.send(result);
     })
 
 
