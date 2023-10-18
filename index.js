@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 })
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@cluster0.c60ctk1.mongodb.net/?retryWrites=true&w=majority`;
 
 
@@ -41,6 +41,13 @@ async function run() {
         res.send(result)
     })
 
+    app.get('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await productsCollection.findOne({ _id: new ObjectId(id) });
+      res.send(result);
+    })
+
+
     app.get('/users',async (req, res) => {
         const result = await usersCollection.find().toArray();
         res.send(result)
@@ -55,12 +62,37 @@ async function run() {
 
     })
 
+    app.put('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = {_id : new ObjectId(id)}
+      const option = {upsert : true}
+      const updatedProduct = req.body
+      const Product = {
+        $set: {
+          photo : updatedProduct.photo, 
+          productName : updatedProduct.productName, 
+          brandName : updatedProduct.brandName, 
+          type : updatedProduct.type, 
+          price : updatedProduct.price, 
+          description : updatedProduct.description, 
+          rating : updatedProduct.rating
+ 
+        }
+      }
+      const result = await productsCollection.updateOne(filter, Product, option);
+      res.send(result);
+    })
+
+
+
     app.post('/users', async (req,res) =>{
       const newUser = req.body;
       console.log(newUser);
       const result = await usersCollection.insertOne(newUser);
       res.send(result);
     })
+
+   
 
 
 
