@@ -33,7 +33,8 @@ async function run() {
     await client.connect();
 
     const productsCollection = client.db('products').collection('product');
-    const usersCollection = client.db('Truecarusersdb').collection('Truecarusers')
+    const usersCollection = client.db('Truecarusersdb').collection('Truecarusers');
+    const mycartCollection = client.db('myCart').collection('cartProducts')
 
     
     app.get('/products',async (req, res) => {
@@ -47,10 +48,22 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/mycart/:id', async (req,res) => {
+      const id = req.params.id;
+      const result = await mycartCollection.findOne({_id: id });
+      res.send(result);
+    })
+
+  
 
     app.get('/users',async (req, res) => {
         const result = await usersCollection.find().toArray();
         res.send(result)
+    })
+
+    app.get('/mycart', async (req, res) => {
+      const result = await mycartCollection.find().toArray();
+      res.send(result)
     })
     
 
@@ -61,6 +74,16 @@ async function run() {
         res.send(result)
 
     })
+
+    app.post('/mycart', async (req, res) => {
+      const newProduct = req.body;
+        const result = await mycartCollection.insertOne(newProduct);
+        res.send(result)
+    })
+
+
+    
+      
 
     app.put('/products/:id', async (req, res) => {
       const id = req.params.id;
@@ -78,11 +101,11 @@ async function run() {
           rating : updatedProduct.rating
  
         }
+
       }
       const result = await productsCollection.updateOne(filter, Product, option);
       res.send(result);
     })
-
 
 
     app.post('/users', async (req,res) =>{
@@ -92,11 +115,7 @@ async function run() {
       res.send(result);
     })
 
-   
-
-
-
-
+    
 
    
     await client.db("admin").command({ ping: 1 });
