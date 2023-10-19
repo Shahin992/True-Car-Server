@@ -48,13 +48,7 @@ async function run() {
       res.send(result);
     })
 
-    app.get('/mycart/:id', async (req,res) => {
-      const id = req.params.id;
-      const result = await mycartCollection.findOne({_id: id });
-      res.send(result);
-    })
-
-  
+    
 
     app.get('/users',async (req, res) => {
         const result = await usersCollection.find().toArray();
@@ -72,7 +66,6 @@ async function run() {
         console.log(newProduct);
         const result = await productsCollection.insertOne(newProduct);
         res.send(result)
-
     })
 
     app.post('/mycart', async (req, res) => {
@@ -82,7 +75,13 @@ async function run() {
     })
 
 
-    
+     app.delete('/mycart/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const query = { _id: new ObjectId(id) }
+            const result = await mycartCollection.deleteOne(query);
+            res.send(result);
+        })
       
 
     app.put('/products/:id', async (req, res) => {
