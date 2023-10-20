@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('Welcome to trueCar server')
 })
 
 
@@ -30,7 +30,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const productsCollection = client.db('products').collection('product');
     const usersCollection = client.db('Truecarusersdb').collection('Truecarusers');
@@ -48,41 +48,43 @@ async function run() {
       res.send(result);
     })
 
-    
-
+  
     app.get('/users',async (req, res) => {
         const result = await usersCollection.find().toArray();
         res.send(result)
     })
 
+
     app.get('/mycart', async (req, res) => {
       const result = await mycartCollection.find().toArray();
       res.send(result)
     })
-    
+
+    app.get('/mycart/:email', async (req,res) => {
+      const useremail = req.params.email;
+      const result = await mycartCollection.find({cartUser: useremail}).toArray();
+      res.send(result);
+    })
+
 
     app.post('/products', async (req, res) => {
         const newProduct = req.body;
-        console.log(newProduct);
         const result = await productsCollection.insertOne(newProduct);
         res.send(result)
     })
-
+  
     app.post('/mycart', async (req, res) => {
       const newProduct = req.body;
         const result = await mycartCollection.insertOne(newProduct);
         res.send(result)
     })
 
-
      app.delete('/mycart/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const query = { _id: new ObjectId(id) }
             const result = await mycartCollection.deleteOne(query);
             res.send(result);
         })
-      
 
     app.put('/products/:id', async (req, res) => {
       const id = req.params.id;
@@ -106,7 +108,6 @@ async function run() {
       res.send(result);
     })
 
-
     app.post('/users', async (req,res) =>{
       const newUser = req.body;
       console.log(newUser);
@@ -114,10 +115,7 @@ async function run() {
       res.send(result);
     })
 
-    
-
-   
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
@@ -126,12 +124,7 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
-
-
-
-
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
